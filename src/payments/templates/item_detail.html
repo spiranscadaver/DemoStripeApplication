@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+ <head>
+   <script src="https://js.stripe.com/v3/"></script>
+     <title></title>
+ </head>
+<h1 class="text-center">Purchase information</h1>
+<div class="container">
+
+</div>
+    <div class="card">
+        <div class="card-header">
+
+        </div>
+        <div class="card-body">
+            <div class="container row">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-10">
+                    <h1>Name: {{ object.name }}</h1>
+                    <p>Description: {{ object.description }}</p>
+                    <p>Price: {{ object.price }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex">
+            <input type="button" value="Start" onclick="submit()">
+         </div>
+    {% csrf_token %}
+
+<script type="text/javascript">
+    var stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+    function submit() {
+        console.log("button was pressed")
+        fetch("{% url 'create_checkout_session' pk=object.pk %}", {method: "GET"})
+        .then(function(response) {
+            return response.json()
+        })
+        .then(function(session) {
+            console.log(session)
+            return stripe.redirectToCheckout({ sessionId: session.sessionId })
+        })
+        .then(function(result) {
+            if (result.error) {
+                console.log('Error:', result.error.message)
+            }
+        })
+        .catch(function(error) {
+            console.log('Error:', error);
+        });
+    }
+</script>
